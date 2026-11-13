@@ -212,7 +212,7 @@ footer a{color:var(--ink)}
 
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .tape p,.hint i{animation:none}
+  .hint i{animation:none}
   *{transition:none!important}
 }
 </style>
@@ -464,7 +464,7 @@ const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     ctx.clearRect(0,0,W,H); ctx.lineJoin = "round"; ctx.lineCap = "round";
     bolts.forEach(b => {
       const a = b.life * (Math.random() > .25 ? 1 : .4);
-      if (b.life > .8){ ctx.globalAlpha = (b.life - .8) * .9; ctx.fillStyle = "#3f8cff"; ctx.fillRect(0,0,W,H); }
+      if (!reduce && b.life > .8){ ctx.globalAlpha = (b.life - .8) * .9; ctx.fillStyle = "#3f8cff"; ctx.fillRect(0,0,W,H); }
       ctx.shadowColor = "#fcd427"; ctx.shadowBlur = 24;
       line(b.main, 7, "#fcd427", a * .5); line(b.main, 2.5, "#fffbe0", a);
       b.forks.forEach(f => line(f, 1.5, "#fcd427", a * .7));
@@ -473,10 +473,10 @@ const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     ctx.globalAlpha = 1; bolts = bolts.filter(b => b.life > 0);
     raf = bolts.length ? requestAnimationFrame(draw) : (ctx.clearRect(0,0,W,H), 0);
   }
-  size(); addEventListener("resize", size);
+  size(); addEventListener("resize", size); if (window.ResizeObserver) new ResizeObserver(size).observe(hero);
   hero.addEventListener("pointerdown", e => { if (e.target.closest("a,button")) return;
     const r = hero.getBoundingClientRect(); strike(e.clientX - r.left, e.clientY - r.top); });
-  if (!reduce){
+  {
     setTimeout(() => strike(W * .75, H * .5), 500);
     setInterval(() => { if (!document.hidden && hero.getBoundingClientRect().bottom > 100)
       strike(W * (.2 + Math.random()*.7), H * (.4 + Math.random()*.5)); }, 5200);
